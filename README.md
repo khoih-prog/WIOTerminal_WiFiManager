@@ -111,13 +111,13 @@ To re-use the new h-only way, just
 
 ```cpp
 // SSID and PW for Config Portal
-String ssid = "ESP_" + String(ESP_getChipId(), HEX);
-const char* password = "your_password";
+String ssid = "WIOTerminal";
+const char* password = "WIOTerminal_Pass";
 ``` 
-then connect WebBrowser to configurable ConfigPortal IP address, default is 192.168.4.1
+then connect WebBrowser to configurable ConfigPortal IP address, default is 192.168.1.1
 
 - Choose one of the access points scanned, enter password, click ***Save***.
-- ESP will restart, then try to connect to the WiFi netwotk using STA-only mode, ***without running the ConfigPortal WebServer and WiFi AP***. See [Accessing manager after connection](https://github.com/khoih-prog/WIOTerminal_WiFiManager/issues/15).
+- WIO-Terminal will restart, then try to connect to the WiFi netwotk using STA-only mode, ***without running the ConfigPortal WebServer and WiFi AP***. See [Accessing manager after connection](https://github.com/khoih-prog/ESP_WiFiManager/issues/15).
 
 ---
 ---
@@ -129,79 +129,48 @@ then connect WebBrowser to configurable ConfigPortal IP address, default is 192.
 - Include in your sketch
 
 ```cpp
-#ifdef ESP32
-  #include <esp_wifi.h>
-  #include <WiFi.h>
-  #include <WiFiClient.h>
-
-  // From v1.1.0
-  #include <WiFiMulti.h>
-  WiFiMulti wifiMulti;
-
-  #define USE_SPIFFS      true
-
-  #if USE_SPIFFS
-    #include <SPIFFS.h>
-    FS* filesystem =      &SPIFFS;
-    #define FileFS        SPIFFS
-    #define FS_Name       "SPIFFS"
-  #else
-    // Use FFat
-    #include <FFat.h>
-    FS* filesystem =      &FFat;
-    #define FileFS        FFat
-    #define FS_Name       "FFat"
-  #endif
-  //////
-
-  #define ESP_getChipId()   ((uint32_t)ESP.getEfuseMac())
-
-  #define LED_BUILTIN       2
-  #define LED_ON            HIGH
-  #define LED_OFF           LOW
-
-#else
-#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
-  //needed for library
-  #include <DNSServer.h>
-  #include <ESP8266WebServer.h>
-
-  // From v1.1.0
-  #include <ESP8266WiFiMulti.h>
-  ESP8266WiFiMulti wifiMulti;
-
-  #define USE_LITTLEFS      true
-  
-  #if USE_LITTLEFS
-    #include <LittleFS.h>
-    FS* filesystem =      &LittleFS;
-    #define FileFS        LittleFS
-    #define FS_Name       "LittleFS"
-  #else
-    FS* filesystem =      &SPIFFS;
-    #define FileFS        SPIFFS
-    #define FS_Name       "SPIFFS"
-  #endif
-  //////
-  
-  #define ESP_getChipId()   (ESP.getChipId())
-  
-  #define LED_ON      LOW
-  #define LED_OFF     HIGH
+#if !defined(WIO_TERMINAL)
+  #error This code is intended to run on the WIO Terminal SAMD51 platform! Please check your Tools->Board setting.
 #endif
 
+// Use from 0 to 4. Higher number, more debugging messages and memory usage.
+#define _WIO_WIFIMGR_LOGLEVEL_    4
+
+#include <rpcWiFi.h>
+
+#include <WiFiMulti.h>
+WiFiMulti wifiMulti;
+
+#include <DNSServer.h>
+#include <WebServer.h>
+
+// Include EEPROM-like API for FlashStorage
+#include <FlashAsEEPROM_SAMD.h>             //https://github.com/khoih-prog/FlashStorage_SAMD
+
+#ifndef EEPROM_START
+  #define EEPROM_START     0
+#endif
+
+/*
+    Trigger for inititating config mode is Pin WIO_KEY_C on WIO Terminal
+*/
+const int TRIGGER_PIN = WIO_KEY_C;
+/*
+   Alternative trigger pin. Needs to be connected to a button to use this pin. It must be a momentary connection
+   not connected permanently to ground. Either trigger pin will work.
+*/
+const int TRIGGER_PIN2 = WIO_KEY_B;
+
 // SSID and PW for Config Portal
-String ssid = "ESP_" + String(ESP_getChipId(), HEX);
-const char* password = "your_password";
+String ssid = "WIOTerminal";
+const char* password = "WIOTerminal_Pass";
 
 // SSID and PW for your Router
 String Router_SSID;
 String Router_Pass;
 
-// From v1.1.0
-// You only need to format the filesystem once
-//#define FORMAT_FILESYSTEM       true
-#define FORMAT_FILESYSTEM         false
+#define LED_ON      HIGH
+#define LED_OFF     LOW
 
 #define MIN_AP_PASSWORD_SIZE    8
 
@@ -230,396 +199,33 @@ typedef struct
 
 WM_Config         WM_config;
 
-#define  CONFIG_FILENAME              F("/wifi_cred.dat")
 //////
 
-#include <WIOTerminal_WiFiManager.h>              //https://github.com/khoih-prog/WIOTerminal_WiFiManager
-```
----
-
-#### 2. Using many configurable parameters
-
-- Include in your sketch
-
-```cpp
-#ifdef ESP32
-  #include <esp_wifi.h>
-  #include <WiFi.h>
-  #include <WiFiClient.h>
-
-  // From v1.1.0
-  #include <WiFiMulti.h>
-  WiFiMulti wifiMulti;
-
-  #define USE_SPIFFS      true
-
-  #if USE_SPIFFS
-    #include <SPIFFS.h>
-    FS* filesystem =      &SPIFFS;
-    #define FileFS        SPIFFS
-    #define FS_Name       "SPIFFS"
-  #else
-    // Use FFat
-    #include <FFat.h>
-    FS* filesystem =      &FFat;
-    #define FileFS        FFat
-    #define FS_Name       "FFat"
-  #endif
-  //////
-
-  #define ESP_getChipId()   ((uint32_t)ESP.getEfuseMac())
-
-  #define LED_BUILTIN       2
-  #define LED_ON            HIGH
-  #define LED_OFF           LOW
-
-#else
-#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
-  //needed for library
-  #include <DNSServer.h>
-  #include <ESP8266WebServer.h>
-
-  // From v1.1.0
-  #include <ESP8266WiFiMulti.h>
-  ESP8266WiFiMulti wifiMulti;
-
-  #define USE_LITTLEFS      true
-  
-  #if USE_LITTLEFS
-    #include <LittleFS.h>
-    FS* filesystem = &LittleFS;
-    #define FileFS    LittleFS
-    #define FS_Name       "LittleFS"
-  #else
-    FS* filesystem = &SPIFFS;
-    #define FileFS    SPIFFS
-    #define FS_Name       "SPIFFS"
-  #endif
-  //////
-  
-  #define ESP_getChipId()   (ESP.getChipId())
-  
-  #define LED_ON      LOW
-  #define LED_OFF     HIGH
-#endif
-
-// SSID and PW for Config Portal
-String ssid = "ESP_" + String(ESP_getChipId(), HEX);
-const char* password = "your_password";
-
-// SSID and PW for your Router
-String Router_SSID;
-String Router_Pass;
-
-// From v1.1.0
-// You only need to format the filesystem once
-//#define FORMAT_FILESYSTEM       true
-#define FORMAT_FILESYSTEM         false
-
-#define MIN_AP_PASSWORD_SIZE    8
-
-#define SSID_MAX_LEN            32
-//From v1.0.10, WPA2 passwords can be up to 63 characters long.
-#define PASS_MAX_LEN            64
-
-typedef struct
-{
-  char wifi_ssid[SSID_MAX_LEN];
-  char wifi_pw  [PASS_MAX_LEN];
-}  WiFi_Credentials;
-
-typedef struct
-{
-  String wifi_ssid;
-  String wifi_pw;
-}  WiFi_Credentials_String;
-
-#define NUM_WIFI_CREDENTIALS      2
-
-typedef struct
-{
-  WiFi_Credentials  WiFi_Creds [NUM_WIFI_CREDENTIALS];
-} WM_Config;
-
-WM_Config         WM_config;
-
-#define  CONFIG_FILENAME              F("/wifi_cred.dat")
-//////
-
-// Indicates whether ESP has WiFi credentials saved from previous session
+// Indicates whether ESP has WiFi credentials saved from previous session, or double reset detected
 bool initialConfig = false;
+//////
 
 // Use false if you don't like to display Available Pages in Information Page of Config Portal
 // Comment out or use true to display Available Pages in Information Page of Config Portal
-// Must be placed before #include <WIOTerminal_WiFiManager.h>
+// Must be placed before #include <WIO_WiFiManager.h>
 #define USE_AVAILABLE_PAGES     false
 
-// From v1.0.10 to permit disable/enable StaticIP configuration in Config Portal from sketch. Valid only if DHCP is used.
-// You'll loose the feature of dynamically changing from DHCP to static IP, or vice versa
-// You have to explicitly specify false to disable the feature.
-//#define USE_STATIC_IP_CONFIG_IN_CP          false
-
-// Use false to disable NTP config. Advisable when using Cellphone, Tablet to access Config Portal.
-// See Issue 23: On Android phone ConfigPortal is unresponsive (https://github.com/khoih-prog/WIOTerminal_WiFiManager/issues/23)
-#define USE_WIOTerminal_WiFiManager_NTP     false
-
-// Use true to enable CloudFlare NTP service. System can hang if you don't have Internet access while accessing CloudFlare
-// See Issue #21: CloudFlare link in the default portal (https://github.com/khoih-prog/WIOTerminal_WiFiManager/issues/21)
-#define USE_CLOUDFLARE_NTP          false
-
 // New in v1.0.11
-#define USING_CORS_FEATURE          true
+#define USING_CORS_FEATURE          false
 //////
 
-// Use USE_DHCP_IP == true for dynamic DHCP IP, false to use static IP which you have to change accordingly to your network
-#if (defined(USE_STATIC_IP_CONFIG_IN_CP) && !USE_STATIC_IP_CONFIG_IN_CP)
-  // Force DHCP to be true
-  #if defined(USE_DHCP_IP)
-    #undef USE_DHCP_IP
-  #endif
-  #define USE_DHCP_IP     true
-#else
-  // You can select DHCP or Static IP here
-  //#define USE_DHCP_IP     true
-  #define USE_DHCP_IP     false
-#endif
+// Use DHCP
+#warning Using DHCP IP
+IPAddress stationIP   = IPAddress(0, 0, 0, 0);
+IPAddress gatewayIP   = IPAddress(192, 168, 2, 1);
+IPAddress netMask     = IPAddress(255, 255, 255, 0);
 
-#if ( USE_DHCP_IP || ( defined(USE_STATIC_IP_CONFIG_IN_CP) && !USE_STATIC_IP_CONFIG_IN_CP ) )
-  // Use DHCP
-  #warning Using DHCP IP
-  IPAddress stationIP   = IPAddress(0, 0, 0, 0);
-  IPAddress gatewayIP   = IPAddress(192, 168, 2, 1);
-  IPAddress netMask     = IPAddress(255, 255, 255, 0);
-#else
-  // Use static IP
-  #warning Using static IP
-  #ifdef ESP32
-    IPAddress stationIP   = IPAddress(192, 168, 2, 232);
-  #else
-    IPAddress stationIP   = IPAddress(192, 168, 2, 186);
-  #endif
-  
-  IPAddress gatewayIP   = IPAddress(192, 168, 2, 1);
-  IPAddress netMask     = IPAddress(255, 255, 255, 0);
-#endif
+#include <WIOTerminal_WiFiManager.h>              //https://github.com/khoih-prog/WIO_WiFiManager
 
-#define USE_CONFIGURABLE_DNS      true
-
-IPAddress dns1IP      = gatewayIP;
-IPAddress dns2IP      = IPAddress(8, 8, 8, 8);
-
-#include <WIOTerminal_WiFiManager.h>              //https://github.com/khoih-prog/WIOTerminal_WiFiManager
-```
-
----
-
-#### 3. Using STA-mode DHCP, but don't like to change to static IP or display in Config Portal
-
-```cpp
-// From v1.0.10 to permit disable/enable StaticIP configuration in Config Portal from sketch. Valid only if DHCP is used.
-// You'll loose the feature of dynamically changing from DHCP to static IP, or vice versa
-// You have to explicitly specify false to disable the feature.
-#define USE_STATIC_IP_CONFIG_IN_CP          false
-
-```
-
----
-
-#### 4. Using STA-mode DHCP, but permit to change to static IP and display in Config Portal
-
-```cpp
-// From v1.0.10 to permit disable/enable StaticIP configuration in Config Portal from sketch. Valid only if DHCP is used.
-// You'll loose the feature of dynamically changing from DHCP to static IP, or vice versa
-// You have to explicitly specify false to disable the feature.
-//#define USE_STATIC_IP_CONFIG_IN_CP          false
-
-// Use USE_DHCP_IP == true for dynamic DHCP IP, false to use static IP which you have to change accordingly to your network
-#if (defined(USE_STATIC_IP_CONFIG_IN_CP) && !USE_STATIC_IP_CONFIG_IN_CP)
-  // Force DHCP to be true
-  #if defined(USE_DHCP_IP)
-    #undef USE_DHCP_IP
-  #endif
-  #define USE_DHCP_IP     true
-#else
-  // You can select DHCP or Static IP here
-  #define USE_DHCP_IP     true
-#endif
-
-```
-
----
-
-#### 5. Using STA-mode StaticIP, and be able to change to DHCP IP and display in Config Portal
-
-```cpp
-// From v1.0.10 to permit disable/enable StaticIP configuration in Config Portal from sketch. Valid only if DHCP is used.
-// You'll loose the feature of dynamically changing from DHCP to static IP, or vice versa
-// You have to explicitly specify false to disable the feature.
-//#define USE_STATIC_IP_CONFIG_IN_CP          false
-
-// Use USE_DHCP_IP == true for dynamic DHCP IP, false to use static IP which you have to change accordingly to your network
-#if (defined(USE_STATIC_IP_CONFIG_IN_CP) && !USE_STATIC_IP_CONFIG_IN_CP)
-  // Force DHCP to be true
-  #if defined(USE_DHCP_IP)
-    #undef USE_DHCP_IP
-  #endif
-  #define USE_DHCP_IP     true
-#else
-  // You can select DHCP or Static IP here
-  #define USE_DHCP_IP     false
-#endif
-
-```
-
----
-
-#### 6. Using STA-mode StaticIP and configurable DNS, and be able to change to DHCP IP and display in Config Portal
-
-```cpp
-// From v1.0.10 to permit disable/enable StaticIP configuration in Config Portal from sketch. Valid only if DHCP is used.
-// You'll loose the feature of dynamically changing from DHCP to static IP, or vice versa
-// You have to explicitly specify false to disable the feature.
-//#define USE_STATIC_IP_CONFIG_IN_CP          false
-
-// Use USE_DHCP_IP == true for dynamic DHCP IP, false to use static IP which you have to change accordingly to your network
-#if (defined(USE_STATIC_IP_CONFIG_IN_CP) && !USE_STATIC_IP_CONFIG_IN_CP)
-  // Force DHCP to be true
-  #if defined(USE_DHCP_IP)
-    #undef USE_DHCP_IP
-  #endif
-  #define USE_DHCP_IP     true
-#else
-  // You can select DHCP or Static IP here
-  #define USE_DHCP_IP     false
-#endif
-
-#define USE_CONFIGURABLE_DNS      true
-
-IPAddress dns1IP      = gatewayIP;
-IPAddress dns2IP      = IPAddress(8, 8, 8, 8);
-
-```
-
----
-
-#### 7. Using STA-mode StaticIP and auto DNS, and be able to change to DHCP IP and display in Config Portal
-
-```cpp
-// From v1.0.10 to permit disable/enable StaticIP configuration in Config Portal from sketch. Valid only if DHCP is used.
-// You'll loose the feature of dynamically changing from DHCP to static IP, or vice versa
-// You have to explicitly specify false to disable the feature.
-//#define USE_STATIC_IP_CONFIG_IN_CP          false
-
-// Use USE_DHCP_IP == true for dynamic DHCP IP, false to use static IP which you have to change accordingly to your network
-#if (defined(USE_STATIC_IP_CONFIG_IN_CP) && !USE_STATIC_IP_CONFIG_IN_CP)
-  // Force DHCP to be true
-  #if defined(USE_DHCP_IP)
-    #undef USE_DHCP_IP
-  #endif
-  #define USE_DHCP_IP     true
-#else
-  // You can select DHCP or Static IP here
-  #define USE_DHCP_IP     false
-#endif
-
-#define USE_CONFIGURABLE_DNS      false
-
-```
-
----
-
-#### 8. Not using NTP to avoid issue with some WebBrowsers, especially in CellPhone or Tablets.
-
-
-```cpp
-// Use false to disable NTP config. Advisable when using Cellphone, Tablet to access Config Portal.
-// See Issue 23: On Android phone ConfigPortal is unresponsive (https://github.com/khoih-prog/WIOTerminal_WiFiManager/issues/23)
-#define USE_WIOTerminal_WiFiManager_NTP     false
-
-```
-
----
-
-#### 9. Using NTP feature with CloudFlare. System can hang until you have Internet access for CloudFlare.
-
-
-```cpp
-// Use false to disable NTP config. Advisable when using Cellphone, Tablet to access Config Portal.
-// See Issue 23: On Android phone ConfigPortal is unresponsive (https://github.com/khoih-prog/WIOTerminal_WiFiManager/issues/23)
-#define USE_WIOTerminal_WiFiManager_NTP     true
-
-// Use true to enable CloudFlare NTP service. System can hang if you don't have Internet access while accessing CloudFlare
-// See Issue #21: CloudFlare link in the default portal (https://github.com/khoih-prog/WIOTerminal_WiFiManager/issues/21)
-#define USE_CLOUDFLARE_NTP          true
-
-```
-
----
-
-#### 10. Using NTP feature without CloudFlare to avoid system hang if no Internet access for CloudFlare.
-
-
-```cpp
-// Use false to disable NTP config. Advisable when using Cellphone, Tablet to access Config Portal.
-// See Issue 23: On Android phone ConfigPortal is unresponsive (https://github.com/khoih-prog/WIOTerminal_WiFiManager/issues/23)
-#define USE_WIOTerminal_WiFiManager_NTP     true
-
-// Use true to enable CloudFlare NTP service. System can hang if you don't have Internet access while accessing CloudFlare
-// See Issue #21: CloudFlare link in the default portal (https://github.com/khoih-prog/WIOTerminal_WiFiManager/issues/21)
-#define USE_CLOUDFLARE_NTP          false
-
-```
-
----
-
-#### 11. Using random AP-mode channel to avoid conflict
-
-
-```cpp
-// From v1.0.10 only
-// Set config portal channel, default = 1. Use 0 => random channel from 1-13
-WIOTerminal_WiFiManager.setConfigPortalChannel(0);
-//////
-```
-
----
-
-#### 12. Using fixed AP-mode channel, for example channel 3
-
-
-```cpp
-// From v1.0.10 only
-// Set config portal channel, default = 1. Use 0 => random channel from 1-13
-WIOTerminal_WiFiManager.setConfigPortalChannel(3);
-//////
 ```
 ---
 
-#### 13. Setting STA-mode static IP
-
-
-```cpp
-// Set static IP, Gateway, Subnetmask, DNS1 and DNS2. New in v1.0.5
-WIOTerminal_WiFiManager.setSTAStaticIPConfig(stationIP, gatewayIP, netMask, dns1IP, dns2IP);
-```
----
-
-#### 14. Using AUTOCONNECT_NO_INVALIDATE feature
-
-1. Don't invalidate WiFi SSID/PW when calling autoConnect()  (default)
-
-```cpp
-#define AUTOCONNECT_NO_INVALIDATE     true
-```
-
-2. To invalidate WiFi SSID/PW when calling autoConnect()
-
-```cpp
-#define AUTOCONNECT_NO_INVALIDATE     false
-```
----
-
-#### 15. Using CORS (Cross-Origin Resource Sharing) feature
+#### 2. Using CORS (Cross-Origin Resource Sharing) feature
 
 1. To use CORS feature with **default** CORS Header "*". Some WebBrowsers won't accept this allowing-all "*" CORS Header.
 
@@ -651,7 +257,7 @@ WIOTerminal_WiFiManager.setSTAStaticIPConfig(stationIP, gatewayIP, netMask, dns1
 
 ---
 
-#### 16. Using MultiWiFi auto(Re)connect feature
+#### 3. Using MultiWiFi auto(Re)connect feature
 
 1. In loop()
 
@@ -695,18 +301,10 @@ void loop()
 
 ### HOWTO Open Config Portal
 
-- When you want to open a config portal, with default DHCP hostname `ESP8266-XXXXXX` or `ESP32-XXXXXX`, just add
+- When you want to open a config portal, just add
 
 ```cpp
 WIOTerminal_WiFiManager WIOTerminal_WiFiManager;
-```
-If you'd like to have a personalized hostname 
-`(RFC952-conformed,- 24 chars max,- only a..z A..Z 0..9 '-' and no '-' as last char)`
-
-add
-
-```cpp
-WIOTerminal_WiFiManager WIOTerminal_WiFiManager("Personalized-HostName");
 ```
 
 then later call
@@ -715,23 +313,8 @@ then later call
 WIOTerminal_WiFiManager.startConfigPortal()
 ```
 
-While in AP mode, connect to it using its `SSID` (ESP_XXXXXX) / `Password` ("your_password"), then open a browser to the AP IP, default `192.168.4.1`, configure wifi then save. The WiFi connection information will be saved in non volatile memory. It will then reboot and autoconnect.
+While in AP mode, connect to it using its `SSID` (WIOTerminal) / `Password` ("WIOTerminal_Pass"), then open a browser to the AP IP, default `192.168.1.1`, configure wifi then save. The WiFi connection information will be saved in non volatile memory. It will then reboot and autoconnect.
 
-You can also change the AP IP by:
-
-```cpp
-//set custom ip for portal
-WIOTerminal_WiFiManager.setAPStaticIPConfig(IPAddress(10,0,1,1), IPAddress(10,0,1,1), IPAddress(255,255,255,0));
-```
-
-and use fixed / dynamic / random AP channel by:
-
-```cpp
-// From v1.0.10 only
-// Set config portal channel, default = 1. Use 0 => random channel from 1-13
-WIOTerminal_WiFiManager.setConfigPortalChannel(0);
-//////
-```
 
 Once WiFi network information is saved in the `WIO-Terminal`, it will try to autoconnect to WiFi every time it is started, without requiring any function calls in the sketch.
 
