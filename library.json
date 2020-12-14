@@ -1,0 +1,44 @@
+{
+  "name": "WIOTerminal_WiFiManager",
+  "version": "1.2.0",
+  "keywords": "wifi, WiFiManager, samd51, seeedstudio, wio, wio-terminal, RTL8720DN, rpcUnified, rpcWiFi",
+  "description": "SAMD51 WIO-Terminal MultiWiFi Connection Manager with enhanced GUI and fallback web ConfigPortal. This Library is used for configuring WIO-Terminal MultiWiFi Credentials at runtime. Now with MultiWiFi auto(Re)connect feature and configurable CORS Header.",
+  "authors":
+  {
+    "name":  "Khoi Hoang",
+    "url":   "https://github.com/khoih-prog",
+    "maintainer": true
+  },
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/khoih-prog/WIOTerminal_WiFiManager"
+  },
+  "homepage": "https://github.com/khoih-prog/WIOTerminal_WiFiManager",
+  "export": {
+    "exclude": [
+      "linux",
+      "extras",
+      "tests"
+    ]
+  },
+  "dependencies": 
+  [
+    {
+      "owner": "khoih.prog",
+      "name": "FlashStorage_SAMD",
+      "version": ">=1.0.0",
+      "platforms": ["atmelsam"]
+    },
+
+    {
+      "owner": "khoih-prog",
+      "name": "DoubleResetDetector_Generic",
+      "version": ">=1.0.2",
+      "platforms": ["*"]
+    }
+  ],
+  "frameworks": "*",
+  "platforms": "atmelsam",
+  "examples": "examples/*/*/*.ino"
+}
