@@ -9,13 +9,13 @@
   2) Ken Taylor   https://github.com/kentaylor
   3) Khoi Hoang   https://github.com/khoih-prog/ESP_WiFiManager
 
-  Built by Khoi Hoang https://github.com/khoih-prog/WIO_WiFiManager
+  Built by Khoi Hoang https://github.com/khoih-prog/WIOTerminal_WiFiManager
   Licensed under MIT license
   Version: 1.2.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
-  1.2.0   K Hoang      30/11/2020 Initial Coding for WIO Terminal. Sync with ESP_WiFiManager v1.2.0
+  1.2.0   K Hoang      14/12/2020 Initial Coding for WIO Terminal. Sync with ESP_WiFiManager v1.2.0
  *****************************************************************************************************************************/
 
 #if !defined(WIO_TERMINAL)
