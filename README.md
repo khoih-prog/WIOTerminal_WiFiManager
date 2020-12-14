@@ -2,7 +2,7 @@
 
 [![arduino-library-badge](https://www.ardu-badge.com/badge/WIOTerminal_WiFiManager.svg?)](https://www.ardu-badge.com/WIOTerminal_WiFiManager)
 [![GitHub release](https://img.shields.io/github/release/khoih-prog/WIOTerminal_WiFiManager.svg)](https://github.com/khoih-prog/WIOTerminal_WiFiManager/releases)
-[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/master/LICENSE)
+[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/LICENSE)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
 [![GitHub issues](https://img.shields.io/github/issues/khoih-prog/WIOTerminal_WiFiManager.svg)](http://github.com/khoih-prog/WIOTerminal_WiFiManager/issues)
 
@@ -50,9 +50,9 @@ The best and easiest way is to use `Arduino Library Manager`. Search for `WIOTer
 ### Manual Install
 
 1. Navigate to [WIOTerminal_WiFiManager](https://github.com/khoih-prog/WIOTerminal_WiFiManager) page.
-2. Download the latest release `WIOTerminal_WiFiManager-master.zip`.
-3. Extract the zip file to `WIOTerminal_WiFiManager-master` directory 
-4. Copy the whole `WIOTerminal_WiFiManager-master` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
+2. Download the latest release `WIOTerminal_WiFiManager-main.zip`.
+3. Extract the zip file to `WIOTerminal_WiFiManager-main` directory 
+4. Copy the whole `WIOTerminal_WiFiManager-main` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
 
 ### VS Code & PlatformIO:
 
@@ -343,25 +343,25 @@ const char* password = "WIOTerminal_Pass";
 After you connected, please, go to http://192.168.1.1, you'll see this `Main` page:
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/master/Images/Main.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Main.png">
 </p>
 
 Select `Information` to enter the Info page where the board info will be shown (short page)
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/master/Images/Info_Short.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Info_Short.png">
 </p>
 
 Select `Configuration` to enter this page where you can select an AP and specify its WiFi Credentials
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/master/Images/Configuration.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Configuration.png">
 </p>
 
 Enter your credentials, then click ***Save***. The WiFi Credentials will be saved and the board reboots to connect to the selected WiFi AP.
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/master/Images/Saved.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Saved.png">
 </p>
 
 If you're already connected to a listed WiFi AP and don't want to change anything, just select ***Exit Portal*** from the `Main` page to reboot the board and connect to the previously-stored AP. The WiFi Credentials are still intact.
@@ -1575,7 +1575,7 @@ If you want to contribute to this project:
 
 ### License and credits ###
 
-- The library is licensed under [MIT](https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/master/LICENSE)
+- The library is licensed under [MIT](https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/LICENSE)
 
 ---
 
