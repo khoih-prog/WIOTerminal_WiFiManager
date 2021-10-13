@@ -38,14 +38,14 @@
   * [Callbacks](#callbacks)
     * [Save settings](#save-settings)
   * [ConfigPortal Timeout](#configportal-timeout) 
-  * [On Demand ConfigPortal](r#on-demand-configportal)
+  * [On Demand ConfigPortal](#on-demand-configportal)
   * [Custom Parameters](#custom-parameters)
   * [Custom IP Configuration](#custom-ip-configuration) 
     * [Custom Access Point IP Configuration (currently not working)](#custom-access-point-ip-configuration-currently-not-working)
     * [Custom Station (client) Static IP Configuration (currently not working)](#custom-station-client-static-ip-configuration-currently-not-working) 
   * [Custom HTML, CSS, Javascript](#custom-html-css-javascript)
   * [Filter Networks](#filter-networks) 
-* [Example SAMD-WIOT_ConfigOnDoubleReset](example-wiot_configondoublereset)
+* [Example SAMD-WIOT_ConfigOnDoubleReset](#example-wiot_configondoublereset)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
   * [1. WIOT_ConfigOnDoubleReset](#1-WIOT_ConfigOnDoubleReset)
     * [First start without WiFi Credentials => enter Config Portal (CP)](#first-start-without-wifi-credentials--enter-config-portal-cp)
@@ -58,7 +58,7 @@
     * [First start without WiFi Credentials => enter Config Portal (CP)](#first-start-without-wifi-credentials--enter-config-portal-cp-2)
     * [Reset => Auto reconnect](#reset--auto-reconnect)
     * [Press WIO_KEY_C or WIO_KEY_B to Ener Config Portal](#press-wio_key_c-or-wio_key_b-to-ener-config-portal)
-    * [Save Credentials from CP](save-credentials-from-cp) 
+    * [Save Credentials from CP](#save-credentials-from-cp) 
   * [4. WIOT_ConfigOnStartup](#4-WIOT_ConfigOnStartup)
     * [No stored Credentials, Config Portal will open without timeout](#no-stored-credentials-config-portal-will-open-without-timeout)
     * [Restarted, Config Portal will open with 120s timeout](#restarted-config-portal-will-open-with-120s-timeout)
@@ -1596,6 +1596,11 @@ Due to some problems of still-unmature `Seeed_Arduino_rpcUnified` and `Seeed_Ard
 2. AP IP Address is only `192.168.1.1`
 3. Some new versions of `Seeed_Arduino_rpcUnified` and `Seeed_Arduino_rpcWiFi` will break the WiFi Scanning process and hang there.
 
+
+Please use and test to see if the limitations are fixed.
+
+---
+---
 
 ### TO DO
 
