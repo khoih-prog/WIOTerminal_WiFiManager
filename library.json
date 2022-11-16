@@ -27,18 +27,18 @@
     {
       "owner": "khoih-prog",
       "name": "FlashStorage_SAMD",
-      "version": ">=1.0.0",
-      "platforms": ["atmelsam"]
+      "version": ">=1.3.2",
+      "platforms": ["samd"]
     },
 
     {
       "owner": "khoih-prog",
       "name": "DoubleResetDetector_Generic",
-      "version": ">=1.0.2",
-      "platforms": ["*"]
+      "version": ">=1.8.1",
+      "platforms": ["samd"]
     }
   ],
   "frameworks": "*",
-  "platforms": "atmelsam",
+  "platforms": "samd",
   "examples": "examples/*/*/*.ino"
 }

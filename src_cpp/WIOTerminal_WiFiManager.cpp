@@ -4,7 +4,7 @@
 
   WIOTerminal_WiFiManager is a library for the SeeedStudiocWIO Terminal/Arduino platform
 
-  Modified from 
+  Modified from
   1) Tzapu        https://github.com/tzapu/WiFiManager
   2) Ken Taylor   https://github.com/kentaylor
   3) Khoi Hoang   https://github.com/khoih-prog/ESP_WiFiManager
@@ -43,21 +43,24 @@ WIO_WMParameter::WIO_WMParameter(const char *id, const char *placeholder, const 
 
 ///////////////////////////////////////////////////
 
-WIO_WMParameter::WIO_WMParameter(const char *id, const char *placeholder, const char *defaultValue, int length, const char *custom)
+WIO_WMParameter::WIO_WMParameter(const char *id, const char *placeholder, const char *defaultValue, int length,
+                                 const char *custom)
 {
   init(id, placeholder, defaultValue, length, custom, WFM_LABEL_BEFORE);
 }
 
 ///////////////////////////////////////////////////
 
-WIO_WMParameter::WIO_WMParameter(const char *id, const char *placeholder, const char *defaultValue, int length, const char *custom, int labelPlacement)
+WIO_WMParameter::WIO_WMParameter(const char *id, const char *placeholder, const char *defaultValue, int length,
+                                 const char *custom, int labelPlacement)
 {
   init(id, placeholder, defaultValue, length, custom, labelPlacement);
 }
 
 ///////////////////////////////////////////////////
 
-void WIO_WMParameter::init(const char *id, const char *placeholder, const char *defaultValue, int length, const char *custom, int labelPlacement)
+void WIO_WMParameter::init(const char *id, const char *placeholder, const char *defaultValue, int length,
+                           const char *custom, int labelPlacement)
 {
   _id = id;
   _placeholder = placeholder;
@@ -75,6 +78,7 @@ void WIO_WMParameter::init(const char *id, const char *placeholder, const char *
       strncpy(_value, defaultValue, _length);
     }
   }
+
   _customHTML = custom;
 }
 
@@ -133,28 +137,28 @@ const char* WIO_WMParameter::getCustomHTML()
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-WIO_WiFiManager::WIO_WiFiManager() 
+WIO_WiFiManager::WIO_WiFiManager()
 {
 }
 
 ///////////////////////////////////////////////////
 
 WIO_WiFiManager::~WIO_WiFiManager()
-{  
+{
 }
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::addParameter(WIO_WMParameter *p) 
+void WIO_WiFiManager::addParameter(WIO_WMParameter *p)
 {
-  if(_paramsCount + 1 > WIFI_MANAGER_MAX_PARAMS)
+  if (_paramsCount + 1 > WIFI_MANAGER_MAX_PARAMS)
   {
     //Max parameters exceeded!
-	WIO_LOGDEBUG("WIFI_MANAGER_MAX_PARAMS exceeded, increase number (in WIO_WiFiManager.h) before adding more parameters!");
-	WIO_LOGDEBUG1("Skipping parameter with ID:", p->getID());
-	return;
+    WIO_LOGDEBUG("WIFI_MANAGER_MAX_PARAMS exceeded, increase number (in WIO_WiFiManager.h) before adding more parameters!");
+    WIO_LOGDEBUG1("Skipping parameter with ID:", p->getID());
+    return;
   }
-  
+
   _params[_paramsCount] = p;
   _paramsCount++;
   WIO_LOGDEBUG1("Adding parameter", p->getID());
@@ -171,7 +175,7 @@ void WIO_WiFiManager::setupConfigPortal()
     Some useful discussion at https://github.com/esp8266/Arduino/issues/1615*/
   if (WiFi.getAutoConnect() == 0)
     WiFi.setAutoConnect(1);
- 
+
   if (!dnsServer)
   {
     dnsServer.reset(new DNSServer());
@@ -183,7 +187,7 @@ void WIO_WiFiManager::setupConfigPortal()
     server.reset(new WebServer(80));
     WIO_LOGWARN(F("new WebServer"));
   }
- 
+
   /* Setup the DNS server redirecting all the domains to the apIP */
   if (dnsServer)
   {
@@ -201,26 +205,27 @@ void WIO_WiFiManager::setupConfigPortal()
     {
       // fail passphrase to short or long!
       WIO_LOGERROR(F("Invalid AccessPoint password. Ignoring"));
-      
+
       _apPassword = NULL;
     }
-    
+
     WIO_LOGWARN1(F("AP PWD ="), _apPassword);
   }
-  
-  
+
+
   // KH, new from v1.0.10 to enable dynamic/random channel
   static int channel;
+
   // Use random channel if  _WiFiAPChannel == 0
   if (_WiFiAPChannel == 0)
     channel = (_configPortalStart % MAX_WIFI_CHANNEL) + 1;
   else
     channel = _WiFiAPChannel;
-  
+
   if (_apPassword != NULL)
   {
     WIO_LOGWARN1(F("AP Channel ="), channel);
-    
+
     //WiFi.softAP(_apName, _apPassword);//password option
     WiFi.softAP(_apName, _apPassword, channel);
   }
@@ -229,26 +234,27 @@ void WIO_WiFiManager::setupConfigPortal()
     // Can't use channel here
     WiFi.softAP(_apName);
   }
+
   //////
-  
+
   // From v1.0.11
   // Contributed by AlesSt (https://github.com/AlesSt) to solve issue softAP with custom IP sometimes not working
   // See https://github.com/khoih-prog/WIO_WiFiManager/issues/26 and https://github.com/espressif/arduino-esp32/issues/985
   // delay 100ms to wait for SYSTEM_EVENT_AP_START
   delay(100);
   //////
-  
+
   //optional soft ip config
   if (_ap_static_ip)
   {
     WIO_LOGWARN(F("Custom AP IP/GW/Subnet = "));
     WIO_LOGWARN2(_ap_static_ip, _ap_static_gw, _ap_static_sn);
-    
+
     WiFi.softAPConfig(_ap_static_ip, _ap_static_gw, _ap_static_sn);
   }
 
   delay(500); // Without delay I've seen the IP address blank
-  
+
   WIO_LOGWARN1(F("AP IP address ="), WiFi.softAPIP());
 
   /* Setup web pages: root, wifi config pages, SO captive portal detectors and not found. */
@@ -264,13 +270,13 @@ void WIO_WiFiManager::setupConfigPortal()
   //server->on("/scan", std::bind(&WIO_WiFiManager::handleScan, this));
   server->onNotFound(std::bind(&WIO_WiFiManager::handleNotFound, this));
   server->begin(); // Web server start
-  
+
   WIO_LOGWARN(F("HTTP server started"));
 }
 
 ///////////////////////////////////////////////////////////
 
-bool WIO_WiFiManager::autoConnect() 
+bool WIO_WiFiManager::autoConnect()
 {
 #if defined(WIO_TERMINAL)
   String ssid = "WT-" + WioTerminalID();
@@ -282,7 +288,7 @@ bool WIO_WiFiManager::autoConnect()
 
 ///////////////////////////////////////////////////
 
-bool WIO_WiFiManager::autoConnect(char const *apName, char const *apPassword) 
+bool WIO_WiFiManager::autoConnect(char const *apName, char const *apPassword)
 {
   WIO_LOGDEBUG(F("AutoConnect"));
 
@@ -293,7 +299,7 @@ bool WIO_WiFiManager::autoConnect(char const *apName, char const *apPassword)
   // attempt to connect; should it fail, fall back to AP
   WiFi.mode(WIFI_STA);
 
-  if (connectWifi("", "") == WL_CONNECTED)   
+  if (connectWifi("", "") == WL_CONNECTED)
   {
     WIO_LOGDEBUG1(F("IP Address:"), WiFi.localIP());
 
@@ -308,19 +314,19 @@ bool WIO_WiFiManager::autoConnect(char const *apName, char const *apPassword)
 
 bool WIO_WiFiManager::configPortalHasTimeout()
 {
-    if(_configPortalTimeout == 0)
-    {  
-      // TODO
-      _configPortalStart = millis(); // kludge, bump configportal start time to skew timeouts
-      return false;
-    }
-    
-    return (millis() > _configPortalStart + _configPortalTimeout);
+  if (_configPortalTimeout == 0)
+  {
+    // TODO
+    _configPortalStart = millis(); // kludge, bump configportal start time to skew timeouts
+    return false;
+  }
+
+  return (millis() > _configPortalStart + _configPortalTimeout);
 }
 
 ///////////////////////////////////////////////////
 
-bool WIO_WiFiManager::startConfigPortal() 
+bool WIO_WiFiManager::startConfigPortal()
 {
 #if defined(WIO_TERMINAL)
   String ssid = "WT-" + WioTerminalID();
@@ -343,10 +349,10 @@ bool  WIO_WiFiManager::startConfigPortal(char const *apName, char const *apPassw
   // KH, Must have this for WIO Terminal
   wifi_disconnect();
   //////
-  
+
   WiFi.mode(WIFI_AP_STA);
   WIO_LOGDEBUG("SET AP STA");
-  
+
   _apName = apName;
   _apPassword = apPassword;
 
@@ -354,7 +360,7 @@ bool  WIO_WiFiManager::startConfigPortal(char const *apName, char const *apPassw
   if (_apcallback != NULL)
   {
     WIO_LOGINFO("_apcallback");
-    
+
     _apcallback(this);
   }
 
@@ -372,7 +378,7 @@ bool  WIO_WiFiManager::startConfigPortal(char const *apName, char const *apPassw
     dnsServer->processNextRequest();
     //HTTP
     server->handleClient();
-    
+
     //WIO_LOGERROR(F("s"));
 
     if (connect)
@@ -384,9 +390,9 @@ bool  WIO_WiFiManager::startConfigPortal(char const *apName, char const *apPassw
 
       // using user-provided  _ssid, _pass in place of system-stored ssid and pass
       if (connectWifi(_ssid, _pass) != WL_CONNECTED)
-      {  
+      {
         WIO_LOGERROR(F("Failed to connect"));
-    
+
         //WiFi.mode(WIFI_AP); // Dual mode becomes flaky if not connected to a WiFi network.
       }
       else
@@ -397,6 +403,7 @@ bool  WIO_WiFiManager::startConfigPortal(char const *apName, char const *apPassw
           //todo: check if any custom parameters actually exist, and check if they really changed maybe
           _savecallback();
         }
+
         break;
       }
 
@@ -409,30 +416,31 @@ bool  WIO_WiFiManager::startConfigPortal(char const *apName, char const *apPassw
           //todo: check if any custom parameters actually exist, and check if they really changed maybe
           _savecallback();
         }
+
         break;
       }
     }
 
     if (stopConfigPortal)
     {
-      WIO_LOGERROR("Stop ConfigPortal");  	//KH
-     
+      WIO_LOGERROR("Stop ConfigPortal");    //KH
+
       stopConfigPortal = false;
       break;
     }
-    
+
     yield();
   }
 
   //WiFi.mode(WIFI_STA);
-  
+
   if (TimedOut)
   {
     //setHostname();
 
     // New v1.0.8 to fix static IP when CP not entered or timed-out
     //setWifiStaticIP();
-    
+
     WiFi.begin();
     int connRes = waitForConnectResult();
 
@@ -450,31 +458,33 @@ bool  WIO_WiFiManager::startConfigPortal(char const *apName, char const *apPassw
 ///////////////////////////////////////////////////
 
 void WIO_WiFiManager::setWifiStaticIP()
-{ 
+{
 #if USE_CONFIGURABLE_DNS
+
   if (_sta_static_ip)
   {
     WIO_LOGWARN(F("Custom STA IP/GW/Subnet"));
-   
+
     //***** Added section for DNS config option *****
-    if (_sta_static_dns1 && _sta_static_dns2) 
-    { 
+    if (_sta_static_dns1 && _sta_static_dns2)
+    {
       WIO_LOGWARN(F("DNS1 and DNS2 set"));
- 
+
       WiFi.config(_sta_static_ip, _sta_static_gw, _sta_static_sn, _sta_static_dns1, _sta_static_dns2);
     }
-    else if (_sta_static_dns1) 
+    else if (_sta_static_dns1)
     {
       WIO_LOGWARN(F("Only DNS1 set"));
-     
+
       WiFi.config(_sta_static_ip, _sta_static_gw, _sta_static_sn, _sta_static_dns1);
     }
-    else 
+    else
     {
       WIO_LOGWARN(F("No DNS server set"));
-  
+
       WiFi.config(_sta_static_ip, _sta_static_gw, _sta_static_sn);
     }
+
     //***** End added section for DNS config option *****
 
     WIO_LOGINFO1(F("setWifiStaticIP IP ="), WiFi.localIP());
@@ -483,14 +493,17 @@ void WIO_WiFiManager::setWifiStaticIP()
   {
     WIO_LOGWARN(F("Can't use Custom STA IP/GW/Subnet"));
   }
+
 #else
+
   // check if we've got static_ip settings, if we do, use those.
   if (_sta_static_ip)
   {
     WiFi.config(_sta_static_ip, _sta_static_gw, _sta_static_sn);
-    
+
     WIO_LOGWARN1(F("Custom STA IP/GW/Subnet : "), WiFi.localIP());
   }
+
 #endif
 }
 
@@ -501,26 +514,28 @@ void WIO_WiFiManager::setWifiStaticIP()
 int WIO_WiFiManager::reconnectWifi(void)
 {
   int connectResult;
-  
+
   // using user-provided  _ssid, _pass in place of system-stored ssid and pass
   if ( ( connectResult = connectWifi(_ssid, _pass) ) != WL_CONNECTED)
-  {  
+  {
     WIO_LOGERROR1(F("Failed to connect to"), _ssid);
-    
-#if (!defined(USING_ONE_WIFI) || !USING_ONE_WIFI)       
+
+#if (!defined(USING_ONE_WIFI) || !USING_ONE_WIFI)
+
     if ( ( connectResult = connectWifi(_ssid1, _pass1) ) != WL_CONNECTED)
-    {  
+    {
       WIO_LOGERROR1(F("Failed to connect to"), _ssid1);
 
     }
     else
       WIO_LOGERROR1(F("Connected to"), _ssid1);
+
 #endif
-      
+
   }
   else
-      WIO_LOGERROR1(F("Connected to"), _ssid);
-  
+    WIO_LOGERROR1(F("Connected to"), _ssid);
+
   return connectResult;
 }
 
@@ -533,14 +548,14 @@ int WIO_WiFiManager::connectWifi(String ssid, String pass)
   // But update the Static/DHCP options if changed.
   //if ( (ssid != "") || ( (ssid == "") && (WiFi.SSID() != "") ) )
   if ( (ssid != "") || ( (ssid == "") && WiFi.SSID() ) )
-  {   
+  {
     //fix for auto connect racing issue. Move up from v1.1.0 to avoid resetSettings()
     if (WiFi.status() == WL_CONNECTED)
     {
       WIO_LOGWARN(F("Already connected. Bailing out."));
       return WL_CONNECTED;
     }
-  
+
     if (ssid != "")
       resetSettings();
 
@@ -548,7 +563,7 @@ int WIO_WiFiManager::connectWifi(String ssid, String pass)
 
     // Hostname not working in WIO Terminal
     //setHostname();
-    
+
     // KH, staticIP not working in WIO Terminal
     //setWifiStaticIP();
 
@@ -556,26 +571,26 @@ int WIO_WiFiManager::connectWifi(String ssid, String pass)
     {
       // Start Wifi with new values.
       WIO_LOGWARN(F("Connect to new WiFi using new IP parameters"));
-      
+
       WiFi.begin(ssid.c_str(), pass.c_str());
     }
     else
     {
       // Start Wifi with old values.
       WIO_LOGWARN(F("Connect to previous WiFi using new IP parameters"));
-      
+
       WiFi.begin();
     }
   }
-  else if (WiFi.SSID()) 
-    {
-      // Start Wifi with old values.
-      WIO_LOGWARN(F("Connect to previous WiFi using new IP parameters"));
+  else if (WiFi.SSID())
+  {
+    // Start Wifi with old values.
+    WIO_LOGWARN(F("Connect to previous WiFi using new IP parameters"));
 
-      wifi_disconnect();
+    wifi_disconnect();
 
-      WiFi.begin();
-    } 
+    WiFi.begin();
+  }
   else //if (WiFi.SSID() == "")
   {
     WIO_LOGWARN(F("No saved credentials"));
@@ -597,44 +612,45 @@ int WIO_WiFiManager::connectWifi(String ssid, String pass)
 
 ///////////////////////////////////////////////////
 
-uint8_t WIO_WiFiManager::waitForConnectResult() 
+uint8_t WIO_WiFiManager::waitForConnectResult()
 {
-  if (_connectTimeout == 0) 
+  if (_connectTimeout == 0)
   {
     return WiFi.waitForConnectResult();
-  } 
-  else 
+  }
+  else
   {
     WIO_LOGDEBUG(F("Waiting for connection result with time out"));
-    
+
     unsigned long start = millis();
     bool keepConnecting = true;
     uint8_t status;
-    
-    while (keepConnecting) 
+
+    while (keepConnecting)
     {
       status = WiFi.status();
-      
-      if (millis() > start + _connectTimeout) 
+
+      if (millis() > start + _connectTimeout)
       {
         keepConnecting = false;
         WIO_LOGDEBUG(F("Connection timed out"));
       }
-      
-      if (status == WL_CONNECTED || status == WL_CONNECT_FAILED) 
+
+      if (status == WL_CONNECTED || status == WL_CONNECT_FAILED)
       {
         keepConnecting = false;
       }
-      
+
       delay(20);
     }
+
     return status;
   }
 }
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::startWPS() 
+void WIO_WiFiManager::startWPS()
 {
   // TODO
   WIO_LOGDEBUG("ESP32 WPS TODO");
@@ -650,14 +666,19 @@ const char* WIO_WiFiManager::getStatus(int status)
   {
     case WL_IDLE_STATUS:
       return "WL_IDLE_STATUS";
+
     case WL_NO_SSID_AVAIL:
       return "WL_NO_SSID_AVAIL";
+
     case WL_CONNECTED:
       return "WL_CONNECTED";
+
     case WL_CONNECT_FAILED:
       return "WL_CONNECT_FAILED";
+
     case WL_DISCONNECTED:
       return "WL_DISCONNECTED";
+
     default:
       return "UNKNOWN";
   }
@@ -665,14 +686,14 @@ const char* WIO_WiFiManager::getStatus(int status)
 
 ///////////////////////////////////////////////////
 
-String WIO_WiFiManager::getConfigPortalSSID() 
+String WIO_WiFiManager::getConfigPortalSSID()
 {
   return _apName;
 }
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::resetSettings() 
+void WIO_WiFiManager::resetSettings()
 {
   WIO_LOGDEBUG(F("Removing Wi-Fi Settings"));
   // WIO_LOGDEBUG(F("THIS MAY CAUSE AP NOT TO START UP PROPERLY. YOU NEED TO COMMENT IT OUT AFTER ERASING THE DATA."));
@@ -688,35 +709,35 @@ void WIO_WiFiManager::resetSettings()
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::setTimeout(unsigned long seconds) 
+void WIO_WiFiManager::setTimeout(unsigned long seconds)
 {
   setConfigPortalTimeout(seconds);
 }
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::setConfigPortalTimeout(unsigned long seconds) 
+void WIO_WiFiManager::setConfigPortalTimeout(unsigned long seconds)
 {
   _configPortalTimeout = seconds * 1000;
 }
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::setConnectTimeout(unsigned long seconds) 
+void WIO_WiFiManager::setConnectTimeout(unsigned long seconds)
 {
   _connectTimeout = seconds * 1000;
 }
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::setDebugOutput(bool debug) 
+void WIO_WiFiManager::setDebugOutput(bool debug)
 {
   _debug = debug;
 }
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::setAPStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress sn) 
+void WIO_WiFiManager::setAPStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress sn)
 {
   _ap_static_ip = ip;
   _ap_static_gw = gw;
@@ -725,7 +746,7 @@ void WIO_WiFiManager::setAPStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress 
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::setSTAStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress sn) 
+void WIO_WiFiManager::setSTAStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress sn)
 {
   _sta_static_ip = ip;
   _sta_static_gw = gw;
@@ -735,7 +756,8 @@ void WIO_WiFiManager::setSTAStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress
 ///////////////////////////////////////////////////
 
 #if USE_CONFIGURABLE_DNS
-void WIO_WiFiManager::setSTAStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress sn, IPAddress dns_address_1, IPAddress dns_address_2)
+void WIO_WiFiManager::setSTAStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress sn, IPAddress dns_address_1,
+                                           IPAddress dns_address_2)
 {
   WIO_LOGINFO(F("setSTAStaticIPConfig for USE_CONFIGURABLE_DNS"));
   _sta_static_ip = ip;
@@ -749,14 +771,14 @@ void WIO_WiFiManager::setSTAStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress
 ///////////////////////////////////////////////////
 
 
-void WIO_WiFiManager::setMinimumSignalQuality(int quality) 
+void WIO_WiFiManager::setMinimumSignalQuality(int quality)
 {
   _minimumQuality = quality;
 }
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::setBreakAfterConfig(bool shouldBreak) 
+void WIO_WiFiManager::setBreakAfterConfig(bool shouldBreak)
 {
   _shouldBreakAfterConfig = shouldBreak;
 }
@@ -795,16 +817,16 @@ void WIO_WiFiManager::reportStatus(String &page)
 ///////////////////////////////////////////////////
 
 /** Handle root or redirect to captive portal */
-void WIO_WiFiManager::handleRoot() 
+void WIO_WiFiManager::handleRoot()
 {
   WIO_LOGDEBUG(F("Handle root"));
-  
+
   // Disable _configPortalTimeout when someone accessing Portal to give some time to config
-  _configPortalTimeout = 0;		//KH
-  
-  if (captivePortal()) 
-  { 
-  // If caprive portal redirect instead of displaying the page.
+  _configPortalTimeout = 0;   //KH
+
+  if (captivePortal())
+  {
+    // If caprive portal redirect instead of displaying the page.
     return;
   }
 
@@ -814,7 +836,7 @@ void WIO_WiFiManager::handleRoot()
   // New from v1.1.1, for configure CORS Header, default to WM_HTTP_CORS_ALLOW_ALL = "*"
   server->sendHeader(FPSTR(WM_HTTP_CORS), _CORS_Header);
 #endif
-    
+
   server->sendHeader(FPSTR(WM_HTTP_PRAGMA), FPSTR(WM_HTTP_NO_CACHE));
   server->sendHeader(FPSTR(WM_HTTP_EXPIRES), "-1");
 
@@ -842,23 +864,23 @@ void WIO_WiFiManager::handleRoot()
 //////////////////////////////////////////////////
 
 /** Wifi config page handler */
-void WIO_WiFiManager::handleWifi(bool scan) 
+void WIO_WiFiManager::handleWifi(bool scan)
 {
   WIO_LOGDEBUG(F("Handle Wifi"));
-  
+
   // Disable _configPortalTimeout when someone accessing Portal to give some time to config
-  _configPortalTimeout = 0;		//KH
-  
+  _configPortalTimeout = 0;   //KH
+
   server->sendHeader(FPSTR(WM_HTTP_CACHE_CONTROL), FPSTR(WM_HTTP_NO_STORE));
 
 #if USING_CORS_FEATURE
   // New from v1.1.1, for configure CORS Header, default to WM_HTTP_CORS_ALLOW_ALL = "*"
   server->sendHeader(FPSTR(WM_HTTP_CORS), _CORS_Header);
 #endif
-    
+
   server->sendHeader(FPSTR(WM_HTTP_PRAGMA), FPSTR(WM_HTTP_NO_CACHE));
   server->sendHeader(FPSTR(WM_HTTP_EXPIRES), "-1");
-  
+
   String page = FPSTR(WM_HTTP_HEAD_START);
   page.replace("{v}", "Config ESP");
   page += FPSTR(WM_HTTP_SCRIPT);
@@ -881,13 +903,13 @@ void WIO_WiFiManager::handleWifi(bool scan)
     // From v1.0.10
     page += FPSTR(WM_FLDSET_START);
     //////
-    
+
     //display networks in page
     for (int i = 0; i < numberOfNetworks; i++)
     {
       if (networkIndices[i] == -1)
         continue; // skip dups and those that are below the required quality
-      
+
       WIO_LOGDEBUG1(F("Index ="), i);
       WIO_LOGDEBUG1(F("SSID ="), WiFi.SSID(networkIndices[i]));
       WIO_LOGDEBUG1(F("RSSI ="), WiFi.RSSI(networkIndices[i]));
@@ -909,10 +931,10 @@ void WIO_WiFiManager::handleWifi(bool scan)
         item.replace("{i}", "");
       }
 
-       page += item;
-       delay(0);
+      page += item;
+      delay(0);
     }
-    
+
     // From v1.0.10
     page += FPSTR(WM_FLDSET_END);
     //////
@@ -930,15 +952,17 @@ void WIO_WiFiManager::handleWifi(bool scan)
     {
       break;
     }
-    
+
     // From v1.0.10
     if (i == 1)
     {
       page += FPSTR(WM_FLDSET_START);
     }
+
     //////
 
     String pitem;
+
     switch (_params[i]->getLabelPlacement())
     {
       case WFM_LABEL_BEFORE:
@@ -946,11 +970,13 @@ void WIO_WiFiManager::handleWifi(bool scan)
         //pitem = FPSTR(WM_HTTP_FORM_LABEL);
         //pitem += FPSTR(WM_HTTP_FORM_PARAM);
         break;
+
       case WFM_LABEL_AFTER:
         pitem = FPSTR(WM_HTTP_FORM_LABEL_AFTER);
         //pitem = FPSTR(WM_HTTP_FORM_PARAM);
         //pitem += FPSTR(WM_HTTP_FORM_LABEL);
         break;
+
       default:
         // WFM_NO_LABEL
         pitem = FPSTR(WM_HTTP_FORM_PARAM);
@@ -974,12 +1000,13 @@ void WIO_WiFiManager::handleWifi(bool scan)
 
     page += pitem;
   }
-  
+
   // From v1.0.10
   if (_paramsCount > 0)
   {
     page += FPSTR(WM_FLDSET_END);
   }
+
   //////
 
   if (_params[0] != NULL)
@@ -988,10 +1015,10 @@ void WIO_WiFiManager::handleWifi(bool scan)
   }
 
   //WIO_LOGDEBUG1(F("Static IP ="), _sta_static_ip.toString());
-  
+
   // KH, Comment out in v1.0.9 to permit changing from DHCP to static IP, or vice versa
   // and add staticIP label in CP
-  
+
   // From v1.0.10 to permit disable/enable StaticIP configuration in Config Portal from sketch. Valid only if DHCP is used.
   // You'll loose the feature of dynamically changing from DHCP to static IP, or vice versa
   // You have to explicitly specify false to disable the feature.
@@ -1002,7 +1029,7 @@ void WIO_WiFiManager::handleWifi(bool scan)
 
   server->send(200, "text/html", page);
 
-  WIO_LOGDEBUG(F("Sent config page")); 
+  WIO_LOGDEBUG(F("Sent config page"));
 }
 
 ///////////////////////////////////////////////////
@@ -1015,8 +1042,8 @@ void WIO_WiFiManager::handleWifiSave()
   //SAVE/connect here
   _ssid = server->arg("s").c_str();
   _pass = server->arg("p").c_str();
-  
-#if (!defined(USING_ONE_WIFI) || !USING_ONE_WIFI)     
+
+#if (!defined(USING_ONE_WIFI) || !USING_ONE_WIFI)
   // New from v1.1.0
   _ssid1 = server->arg("s1").c_str();
   _pass1 = server->arg("p1").c_str();
@@ -1035,7 +1062,7 @@ void WIO_WiFiManager::handleWifiSave()
     String value = server->arg(_params[i]->getID()).c_str();
     //store it in array
     value.toCharArray(_params[i]->_value, _params[i]->_length);
-    
+
     WIO_LOGDEBUG2(F("Parameter and value :"), _params[i]->getID(), value);
   }
 
@@ -1048,13 +1075,13 @@ void WIO_WiFiManager::handleWifiSave()
   page += FPSTR(WM_HTTP_SAVED);
   page.replace("{v}", _apName);
   page.replace("{x}", _ssid);
-  
-#if (!defined(USING_ONE_WIFI) || !USING_ONE_WIFI)     
+
+#if (!defined(USING_ONE_WIFI) || !USING_ONE_WIFI)
   // KH, update from v1.1.0
   page.replace("{x1}", _ssid1);
   //////
 #endif
-  
+
   page += FPSTR(WM_HTTP_END);
 
   server->send(200, "text/html", page);
@@ -1073,17 +1100,17 @@ void WIO_WiFiManager::handleWifiSave()
 void WIO_WiFiManager::handleServerClose()
 {
   WIO_LOGDEBUG(F("Server Close"));
-  
+
   server->sendHeader(FPSTR(WM_HTTP_CACHE_CONTROL), FPSTR(WM_HTTP_NO_STORE));
 
 #if USING_CORS_FEATURE
   // New from v1.1.1, for configure CORS Header, default to WM_HTTP_CORS_ALLOW_ALL = "*"
   server->sendHeader(FPSTR(WM_HTTP_CORS), _CORS_Header);
 #endif
-    
+
   server->sendHeader(FPSTR(WM_HTTP_PRAGMA), FPSTR(WM_HTTP_NO_CACHE));
   server->sendHeader(FPSTR(WM_HTTP_EXPIRES), "-1");
-  
+
   String page = FPSTR(WM_HTTP_HEAD_START);
   page.replace("{v}", "Close Server");
   page += FPSTR(WM_HTTP_SCRIPT);
@@ -1103,7 +1130,7 @@ void WIO_WiFiManager::handleServerClose()
   page += FPSTR(WM_HTTP_END);
   server->send(200, "text/html", page);
   stopConfigPortal = true; //signal ready to shutdown config portal
-    
+
   WIO_LOGDEBUG(F("Sent server close page"));
 
   // Restore when Press Save WiFi
@@ -1113,12 +1140,12 @@ void WIO_WiFiManager::handleServerClose()
 ///////////////////////////////////////////////////
 
 /** Handle the info page */
-void WIO_WiFiManager::handleInfo() 
+void WIO_WiFiManager::handleInfo()
 {
   WIO_LOGDEBUG(F("Info"));
 
-// Disable _configPortalTimeout when someone accessing Portal to give some time to config
-  _configPortalTimeout = 0;		//KH
+  // Disable _configPortalTimeout when someone accessing Portal to give some time to config
+  _configPortalTimeout = 0;   //KH
 
   server->sendHeader(FPSTR(WM_HTTP_CACHE_CONTROL), FPSTR(WM_HTTP_NO_STORE));
 
@@ -1126,12 +1153,12 @@ void WIO_WiFiManager::handleInfo()
   // New from v1.1.1, for configure CORS Header, default to WM_HTTP_CORS_ALLOW_ALL = "*"
   server->sendHeader(FPSTR(WM_HTTP_CORS), _CORS_Header);
 #endif
-    
+
   server->sendHeader(FPSTR(WM_HTTP_PRAGMA), FPSTR(WM_HTTP_NO_CACHE));
   server->sendHeader(FPSTR(WM_HTTP_EXPIRES), "-1");
-  
+
   String page = FPSTR(WM_HTTP_HEAD_START);
-  
+
   page.replace("{v}", "Info");
   page += FPSTR(WM_HTTP_SCRIPT);
   page += FPSTR(WM_HTTP_STYLE);
@@ -1189,11 +1216,11 @@ void WIO_WiFiManager::handleInfo()
 ///////////////////////////////////////////////////
 
 /** Handle the reset page */
-void WIO_WiFiManager::handleReset() 
+void WIO_WiFiManager::handleReset()
 {
   WIO_LOGDEBUG(F("Reset"));
-  
-  server->sendHeader(FPSTR(WM_HTTP_CACHE_CONTROL), FPSTR(WM_HTTP_NO_STORE));   
+
+  server->sendHeader(FPSTR(WM_HTTP_CACHE_CONTROL), FPSTR(WM_HTTP_NO_STORE));
   server->sendHeader(FPSTR(WM_HTTP_PRAGMA), FPSTR(WM_HTTP_NO_CACHE));
   server->sendHeader(FPSTR(WM_HTTP_EXPIRES), "-1");
 
@@ -1219,14 +1246,14 @@ void WIO_WiFiManager::handleReset()
 
 ///////////////////////////////////////////////////
 
-void WIO_WiFiManager::handleNotFound() 
+void WIO_WiFiManager::handleNotFound()
 {
-  if (captivePortal()) 
-  { 
+  if (captivePortal())
+  {
     // If captive portal redirect instead of displaying the error page.
     return;
   }
-  
+
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server->uri();
@@ -1236,11 +1263,11 @@ void WIO_WiFiManager::handleNotFound()
   message += server->args();
   message += "\n";
 
-  for ( uint8_t i = 0; i < server->args(); i++ ) 
+  for ( uint8_t i = 0; i < server->args(); i++ )
   {
     message += " " + server->argName ( i ) + ": " + server->arg ( i ) + "\n";
   }
-  
+
   server->sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   server->sendHeader("Pragma", "no-cache");
   server->sendHeader("Expires", "-1");
@@ -1255,24 +1282,26 @@ void WIO_WiFiManager::handleNotFound()
    Redirect to captive portal if we got a request for another domain.
    Return true in that case so the page handler do not try to handle the request again.
 */
-bool WIO_WiFiManager::captivePortal() 
+bool WIO_WiFiManager::captivePortal()
 {
-  if (!isIp(server->hostHeader()) ) 
+  if (!isIp(server->hostHeader()) )
   {
     WIO_LOGDEBUG(F("Request redirected to captive portal"));
     server->sendHeader(F("Location"), (String)F("http://") + toStringIp(server->client().localIP()), true);
-    server->send(302, FPSTR(WM_HTTP_HEAD_CT2), ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
+    server->send(302, FPSTR(WM_HTTP_HEAD_CT2),
+                 ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
     server->client().stop(); // Stop is needed because we sent no content length
-    
+
     return true;
   }
+
   return false;
 }
 
 ///////////////////////////////////////////////////
 
 //start up config portal callback
-void WIO_WiFiManager::setAPCallback( void (*func)(WIO_WiFiManager* myWIO_WiFiManager) ) 
+void WIO_WiFiManager::setAPCallback( void (*func)(WIO_WiFiManager* myWIO_WiFiManager) )
 {
   _apcallback = func;
 }
@@ -1280,13 +1309,13 @@ void WIO_WiFiManager::setAPCallback( void (*func)(WIO_WiFiManager* myWIO_WiFiMan
 ///////////////////////////////////////////////////
 
 //start up save config callback
-void WIO_WiFiManager::setSaveConfigCallback( void (*func)(void) ) 
+void WIO_WiFiManager::setSaveConfigCallback( void (*func)(void) )
 {
   _savecallback = func;
 }
 
 //sets a custom element to add to head, like a new style tag
-void WIO_WiFiManager::setCustomHeadElement(const char* element) 
+void WIO_WiFiManager::setCustomHeadElement(const char* element)
 {
   _customHeadElement = element;
 }
@@ -1294,7 +1323,7 @@ void WIO_WiFiManager::setCustomHeadElement(const char* element)
 ///////////////////////////////////////////////////
 
 //if this is true, remove duplicated Access Points - defaut true
-void WIO_WiFiManager::setRemoveDuplicateAPs(bool removeDuplicates) 
+void WIO_WiFiManager::setRemoveDuplicateAPs(bool removeDuplicates)
 {
   _removeDuplicateAPs = removeDuplicates;
 }
@@ -1309,7 +1338,7 @@ int WIO_WiFiManager::scanWifiNetworks(int **indicesptr)
 
   int n = WiFi.scanNetworks();
 
-  WIO_LOGDEBUG1(F("scanWifiNetworks: Done, Scanned Networks n ="), n); 
+  WIO_LOGDEBUG1(F("scanWifiNetworks: Done, Scanned Networks n ="), n);
 
   //KH, Terrible bug here. WiFi.scanNetworks() returns n < 0 => malloc( negative == very big ) => crash!!!
   //In .../esp32/libraries/WiFi/src/WiFiType.h
@@ -1335,7 +1364,7 @@ int WIO_WiFiManager::scanWifiNetworks(int **indicesptr)
     }
 
     *indicesptr = indices;
-   
+
     //sort networks
     for (int i = 0; i < n; i++)
     {
@@ -1363,12 +1392,14 @@ int WIO_WiFiManager::scanWifiNetworks(int **indicesptr)
     if (_removeDuplicateAPs)
     {
       String cssid;
+
       for (int i = 0; i < n; i++)
       {
         if (indices[i] == -1)
           continue;
 
         cssid = WiFi.SSID(indices[i]);
+
         for (int j = i + 1; j < n; j++)
         {
           if (cssid == WiFi.SSID(indices[j]))
@@ -1395,6 +1426,7 @@ int WIO_WiFiManager::scanWifiNetworks(int **indicesptr)
     }
 
 #if (DEBUG_WIFIMGR > 2)
+
     for (int i = 0; i < n; i++)
     {
       if (indices[i] == -1)
@@ -1402,6 +1434,7 @@ int WIO_WiFiManager::scanWifiNetworks(int **indicesptr)
       else
         Serial.println(WiFi.SSID(indices[i]));
     }
+
 #endif
 
     return (n);
@@ -1410,58 +1443,58 @@ int WIO_WiFiManager::scanWifiNetworks(int **indicesptr)
 
 ///////////////////////////////////////////////////
 
-int WIO_WiFiManager::getRSSIasQuality(int RSSI) 
+int WIO_WiFiManager::getRSSIasQuality(int RSSI)
 {
   int quality = 0;
 
-  if (RSSI <= -100) 
+  if (RSSI <= -100)
   {
     quality = 0;
-  } 
-  else if (RSSI >= -50) 
+  }
+  else if (RSSI >= -50)
   {
     quality = 100;
-  } 
-  else 
+  }
+  else
   {
     quality = 2 * (RSSI + 100);
   }
-  
+
   return quality;
 }
 
 ///////////////////////////////////////////////////
 
 /** Is this an IP? */
-bool WIO_WiFiManager::isIp(String str) 
+bool WIO_WiFiManager::isIp(String str)
 {
-  for (int i = 0; i < str.length(); i++) 
+  for (int i = 0; i < str.length(); i++)
   {
     int c = str.charAt(i);
-    
-    if (c != '.' && (c < '0' || c > '9')) 
+
+    if (c != '.' && (c < '0' || c > '9'))
     {
       return false;
     }
   }
-  
+
   return true;
 }
 
 ///////////////////////////////////////////////////
 
 /** IP to String? */
-String WIO_WiFiManager::toStringIp(IPAddress ip) 
+String WIO_WiFiManager::toStringIp(IPAddress ip)
 {
   String res = "";
-  
-  for (int i = 0; i < 3; i++) 
+
+  for (int i = 0; i < 3; i++)
   {
     res += String((ip >> (8 * i)) & 0xFF) + ".";
   }
-  
+
   res += String(((ip >> 8 * 3)) & 0xFF);
-  
+
   return res;
 }
 
@@ -1492,6 +1525,7 @@ String WIO_WiFiManager::getStoredWiFiSSID()
     esp_wifi_get_config(WIFI_IF_STA, &conf);
     return String(reinterpret_cast<char*>(conf.sta.ssid));
   }
+
 #endif
 
   return String();
@@ -1512,30 +1546,30 @@ String WIO_WiFiManager::getStoredWiFiPass()
 #else
   wifi_config_t conf;
   esp_wifi_get_config(WIFI_IF_STA, &conf);
-  
+
   return String(reinterpret_cast<char*>(conf.sta.password));
 #endif
-  
+
 }
 
 ///////////////////////////////////////////////////
 
 String WIO_WiFiManager::WioTerminalID()
 {
-    char ID[50];
-    uint32_t *id_word0 = (uint32_t *)DEVICE_ID_WORD0;
-    uint32_t *id_word1 = (uint32_t *)DEVICE_ID_WORD1;
-    uint32_t *id_word2 = (uint32_t *)DEVICE_ID_WORD2;
-    uint32_t *id_word3 = (uint32_t *)DEVICE_ID_WORD3;
+  char ID[50];
+  uint32_t *id_word0 = (uint32_t *)DEVICE_ID_WORD0;
+  uint32_t *id_word1 = (uint32_t *)DEVICE_ID_WORD1;
+  uint32_t *id_word2 = (uint32_t *)DEVICE_ID_WORD2;
+  uint32_t *id_word3 = (uint32_t *)DEVICE_ID_WORD3;
 
-    snprintf(ID, 30, "%02X:%02X:%02X:%02X:%02X:%02X",
-        (*id_word0 >> 8) & 0xFF,
-        (*id_word0 >> 0) & 0xFF,
-        (*id_word3 >> 24)& 0xFF,
-        (*id_word3 >> 16)& 0xFF,
-        (*id_word3 >> 8) & 0xFF,
-        (*id_word3 >> 0) & 0xFF
-    );
-    
-    return ID;
+  snprintf(ID, 30, "%02X:%02X:%02X:%02X:%02X:%02X",
+           (*id_word0 >> 8) & 0xFF,
+           (*id_word0 >> 0) & 0xFF,
+           (*id_word3 >> 24) & 0xFF,
+           (*id_word3 >> 16) & 0xFF,
+           (*id_word3 >> 8) & 0xFF,
+           (*id_word3 >> 0) & 0xFF
+          );
+
+  return ID;
 }
