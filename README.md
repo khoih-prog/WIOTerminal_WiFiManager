@@ -418,25 +418,25 @@ const char* password = "WIOTerminal_Pass";
 After you connected, please, go to http://192.168.1.1, you'll see this `Main` page:
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Main.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/raw/main/Images/Main.png">
 </p>
 
 Select `Information` to enter the Info page where the board info will be shown (short page)
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Info_Short.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/raw/main/Images/Info_Short.png">
 </p>
 
 Select `Configuration` to enter this page where you can select an AP and specify its WiFi Credentials
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Configuration.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/raw/main/Images/Configuration.png">
 </p>
 
 Enter your credentials, then click ***Save***. The WiFi Credentials will be saved and the board reboots to connect to the selected WiFi AP.
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Saved.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/raw/main/Images/Saved.png">
 </p>
 
 If you're already connected to a listed WiFi AP and don't want to change anything, just select ***Exit Portal*** from the `Main` page to reboot the board and connect to the previously-stored AP. The WiFi Credentials are still intact.
