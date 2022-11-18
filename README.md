@@ -6,16 +6,84 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
 [![GitHub issues](https://img.shields.io/github/issues/khoih-prog/WIOTerminal_WiFiManager.svg)](http://github.com/khoih-prog/WIOTerminal_WiFiManager/issues)
 
----
----
-
-### Releases v1.2.0
-
-1. Initial Coding for WIO Terminal. Sync with [ESP_WiFiManager v1.2.0](https://github.com/khoih-prog/ESP_WiFiManager)
-
+<a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Donate to my libraries using BuyMeACoffee" style="height: 50px !important;width: 181px !important;" ></a>
+<a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-orange.svg?logo=buy-me-a-coffee&logoColor=FFDD00" style="height: 20px !important;width: 200px !important;" ></a>
+<a href="https://profile-counter.glitch.me/khoih-prog/count.svg" title="Total khoih-prog Visitor count"><img src="https://profile-counter.glitch.me/khoih-prog/count.svg" style="height: 30px;width: 200px;"></a>
+<a href="https://profile-counter.glitch.me/khoih-prog-WIOTerminal_WiFiManager/count.svg" title="WIOTerminal_WiFiManager Visitor count"><img src="https://profile-counter.glitch.me/khoih-prog-WIOTerminal_WiFiManager/count.svg" style="height: 30px;width: 200px;"></a>
 
 ---
 ---
+
+## Table of Contents
+
+* [Why do we need this WIOTerminal_WiFiManager library](#why-do-we-need-this-WIOTerminal_WiFiManager-library)
+  * [Features](#features)
+* [Changelog](changelog.md) 
+* [Prerequisites](#prerequisites)
+* [Installation](#installation)
+  * [Use Arduino Library Manager](#use-arduino-library-manager)
+  * [Manual Install](#manual-install)
+  * [VS Code & PlatformIO](#vs-code--platformio)
+* [Packages' Patches](#packages-patches)
+* [HOWTO Fix `Multiple Definitions` Linker Error](#howto-fix-multiple-definitions-linker-error)
+* [How It Works](#how-it-works) 
+* [HOWTO Basic configurations](#howto-basic-configurations)
+  * [1. Using default for every configurable parameter](#1-using-default-for-every-configurable-parameter)
+  * [2. Using CORS (Cross-Origin Resource Sharing) feature](#2-using-cors-cross-origin-resource-sharing-feature)
+  * [3. Using MultiWiFi auto(Re)connect feature](#3-using-multiwifi-autoreconnect-feature)
+* [HOWTO Open Config Portal](#howto-open-config-portal)
+* [Examples](#examples)
+  * [ 1. WIOT_ConfigOnDoubleReset](examples/WIOT_ConfigOnDoubleReset)
+  * [ 2. WIOT_ConfigOnStartup](examples/WIOT_ConfigOnStartup)
+  * [ 3. WIOT_ConfigOnSwitch](examples/WIOT_ConfigOnSwitch)
+  * [ 4. WIOT_ConfigOnSwitch_1WiFi](examples/WIOT_ConfigOnSwitch_1WiFi)
+* [So, how it works?](#so-how-it-works)
+* [Documentation](#documentation)
+  * [Password protect the configuration Access Point](#password-protect-the-configuration-access-point)
+  * [Callbacks](#callbacks)
+    * [Save settings](#save-settings)
+  * [ConfigPortal Timeout](#configportal-timeout) 
+  * [On Demand ConfigPortal](#on-demand-configportal)
+  * [Custom Parameters](#custom-parameters)
+  * [Custom IP Configuration](#custom-ip-configuration) 
+    * [Custom Access Point IP Configuration (currently not working)](#custom-access-point-ip-configuration-currently-not-working)
+    * [Custom Station (client) Static IP Configuration (currently not working)](#custom-station-client-static-ip-configuration-currently-not-working) 
+  * [Custom HTML, CSS, Javascript](#custom-html-css-javascript)
+  * [Filter Networks](#filter-networks) 
+* [Example SAMD-WIOT_ConfigOnDoubleReset](#example-wiot_configondoublereset)
+* [Debug Terminal Output Samples](#debug-terminal-output-samples)
+  * [1. WIOT_ConfigOnDoubleReset](#1-WIOT_ConfigOnDoubleReset)
+    * [First start without WiFi Credentials => enter Config Portal (CP)](#first-start-without-wifi-credentials--enter-config-portal-cp)
+    * [DRD detected, Config Portal will open](#drd-detected-config-portal-will-open)
+  * [2. WIOT_ConfigOnSwitch](#2-WIOT_ConfigOnSwitch)
+    * [First start without WiFi Credentials => enter Config Portal (CP)](#first-start-without-wifi-credentials--enter-config-portal-cp-1)
+    * [WiFi Lost and reconnect to secondary AP](#wifi-lost-and-reconnect-to-secondary-ap)
+    * [Restart and Read WiFi Credentials from Flash](#restart-and-read-wifi-credentials-from-flash)
+  * [3. WIOT_ConfigOnSwitch_1WiFi](#3-WIOT_ConfigOnSwitch_1WiFi)
+    * [First start without WiFi Credentials => enter Config Portal (CP)](#first-start-without-wifi-credentials--enter-config-portal-cp-2)
+    * [Reset => Auto reconnect](#reset--auto-reconnect)
+    * [Press WIO_KEY_C or WIO_KEY_B to Ener Config Portal](#press-wio_key_c-or-wio_key_b-to-ener-config-portal)
+    * [Save Credentials from CP](#save-credentials-from-cp) 
+  * [4. WIOT_ConfigOnStartup](#4-WIOT_ConfigOnStartup)
+    * [No stored Credentials, Config Portal will open without timeout](#no-stored-credentials-config-portal-will-open-without-timeout)
+    * [Restarted, Config Portal will open with 120s timeout](#restarted-config-portal-will-open-with-120s-timeout)
+* [Debug](#debug)
+* [Troubleshooting](#troubleshooting)
+* [Issues](#issues)
+* [CURRENT LIMITATIONS](#current-limitations)
+* [TO DO](#to-do)
+* [DONE](#done)
+* [Contributions and Thanks](#contributions-and-thanks)
+* [Contributing](#contributing)
+* [License and credits](#license-and-credits)
+* [Copyright](#copyright)
+
+---
+---
+
+### Why do we need this [WIOTerminal_WiFiManager library](https://github.com/khoih-prog/WIOTerminal_WiFiManager)
+
+#### Features
 
 This library is based on, modified, bug-fixed and improved from:
 
@@ -33,11 +101,11 @@ It's using a web ConfigPortal, served from the `WIO-Terminal`, and operating as 
 
 ## Prerequisites
 
- 1. [`Arduino IDE 1.8.13+` for Arduino](https://www.arduino.cc/en/Main/Software)
- 2. [`Seeeduino SAMD core 1.8.1+`](https://www.seeedstudio.com/) for SAMD51 Wio Terminal
- 3. [`Seeed_Arduino_rpcWiFi library v1.0.0+`](https://github.com/Seeed-Studio/Seeed_Arduino_rpcWiFi) for WIO-Terminal or boards using **Realtek RTL8720DN WiFi**. To be used with [`Seeed_Arduino_rpcUnified library v2.0.0+`](https://github.com/Seeed-Studio/Seeed_Arduino_rpcUnified).
- 4. [`FlashStorage_SAMD library v1.0.0+`](https://github.com/khoih-prog/FlashStorage_SAMD) for SAMD.
- 5. [`DoubleResetDetector_Generic v1.0.2+`](https://github.com/khoih-prog/DoubleResetDetector_Generic) if using DRD feature. To install, check [![arduino-library-badge](https://www.ardu-badge.com/badge/DoubleResetDetector_Generic.svg?)](https://www.ardu-badge.com/DoubleResetDetector_Generic).
+ 1. [`Arduino IDE 1.8.19+` for Arduino](https://github.com/arduino/Arduino). [![GitHub release](https://img.shields.io/github/release/arduino/Arduino.svg)](https://github.com/arduino/Arduino/releases/latest)
+ 2. [`Seeeduino SAMD core 1.8.3+`](https://github.com/Seeed-Studio/ArduinoCore-samd) for SAMD51 Wio Terminal. [![Latest release](https://img.shields.io/github/release/Seeed-Studio/ArduinoCore-samd.svg)](https://github.com/Seeed-Studio/ArduinoCore-samd/releases/latest/).
+ 3. [`Seeed_Arduino_rpcWiFi library v1.0.6+`](https://github.com/Seeed-Studio/Seeed_Arduino_rpcWiFi) for WIO-Terminal or boards using **Realtek RTL8720DN WiFi**. [![GitHub release](https://img.shields.io/github/release/Seeed-Studio/Seeed_Arduino_rpcWiFi.svg)](https://github.com/Seeed-Studio/Seeed_Arduino_rpcWiFi/releases/latest). To be used with [`Seeed_Arduino_rpcUnified library v2.1.4+`](https://github.com/Seeed-Studio/Seeed_Arduino_rpcUnified). [![GitHub release](https://img.shields.io/github/release/Seeed-Studio/Seeed_Arduino_rpcUnified.svg)](https://github.com/Seeed-Studio/Seeed_Arduino_rpcUnified/releases/latest).
+ 4. [`FlashStorage_SAMD library v1.3.2+`](https://github.com/khoih-prog/FlashStorage_SAMD) for SAMD21 and SAMD51 boards (ZERO, MKR, NANO_33_IOT, M0, M0 Pro, AdaFruit Itsy-Bitsy M4, etc.). [![GitHub release](https://img.shields.io/github/release/khoih-prog/FlashStorage_SAMD.svg)](https://github.com/khoih-prog/FlashStorage_SAMD/releases/latest)
+ 5. [`DoubleResetDetector_Generic v1.8.1+`](https://github.com/khoih-prog/DoubleResetDetector_Generic) if using DRD feature. To install, check [![arduino-library-badge](https://www.ardu-badge.com/badge/DoubleResetDetector_Generic.svg?)](https://www.ardu-badge.com/DoubleResetDetector_Generic).
 
 ---
 
@@ -58,23 +126,29 @@ The best and easiest way is to use `Arduino Library Manager`. Search for `WIOTer
 
 1. Install [VS Code](https://code.visualstudio.com/)
 2. Install [PlatformIO](https://platformio.org/platformio-ide)
-3. Install [**WIOTerminal_WiFiManager** library](https://platformio.org/lib/show/xxxxx/WIOTerminal_WiFiManager) by using [**Library Manager**](https://platformio.org/lib/show/xxxxx/WIOTerminal_WiFiManager/installation). Search for [**WIOTerminal_WiFiManager**](https://platformio.org/lib/show/xxxxx/WIOTerminal_WiFiManager) in [Platform.io **Author's Libraries**](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
+3. Install [**WIOTerminal_WiFiManager** library](https://registry.platformio.org/libraries/khoih-prog/WIOTerminal_WiFiManager) by using [**Library Manager**](https://registry.platformio.org/libraries/khoih-prog/WIOTerminal_WiFiManager/installation). Search for [**WIOTerminal_WiFiManager**](https://platformio.org/lib/show/11565/WIOTerminal_WiFiManager) in [Platform.io **Author's Libraries**](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
 4. Use included [platformio.ini](platformio/platformio.ini) file from examples to ensure that all dependent libraries will installed automatically. Please visit documentation for the other options and examples at [Project Configuration File](https://docs.platformio.org/page/projectconf.html)
 
 ---
 
 ### Packages' Patches
 
- 1. ***To be able to automatically detect and display BOARD_NAME on Seeeduino SAMD (XIAO M0, Wio Terminal, etc) boards***, you have to copy the file [Seeeduino SAMD platform.txt](Packages_Patches/Seeeduino/hardware/samd/1.8.1) into Adafruit samd directory (~/.arduino15/packages/Seeeduino/hardware/samd/1.8.1). 
+ 1. ***To be able to compile, run and automatically detect and display BOARD_NAME on Seeeduino SAMD (XIAO M0, Wio Terminal, etc) boards***, you have to copy the whole [Seeeduino SAMD Packages_Patches](Packages_Patches/Seeeduino/hardware/samd/1.8.3) directory into Seeeduino samd directory (~/.arduino15/packages/Seeeduino/hardware/samd/1.8.3). 
 
-Supposing the Seeeduino SAMD core version is 1.8.1. This file must be copied into the directory:
+Supposing the Seeeduino SAMD core version is 1.8.3. This file must be copied into the directory:
 
-- `~/.arduino15/packages/Seeeduino/hardware/samd/1.8.1/platform.txt`
+- `~/.arduino15/packages/Seeeduino/hardware/samd/1.8.3/platform.txt`
+- `~/.arduino15/packages/Seeeduino/hardware/samd/1.8.3/cores/arduino/Arduino.h`
+- `~/.arduino15/packages/Seeeduino/hardware/samd/1.8.3/cores/arduino/Print.h`
+- `~/.arduino15/packages/Seeeduino/hardware/samd/1.8.3/cores/arduino/Print.cpp`
 
 Whenever a new version is installed, remember to copy this file into the new version directory. For example, new version is x.yy.zz
 This file must be copied into the directory:
 
 - `~/.arduino15/packages/Seeeduino/hardware/samd/x.yy.zz/platform.txt`
+- `~/.arduino15/packages/Seeeduino/hardware/samd/x.yy.zz/cores/arduino/Arduino.h`
+- `~/.arduino15/packages/Seeeduino/hardware/samd/x.yy.zz/cores/arduino/Print.h`
+- `~/.arduino15/packages/Seeeduino/hardware/samd/x.yy.zz/cores/arduino/Print.cpp`
 
 ---
 ---
@@ -113,7 +187,8 @@ To re-use the new h-only way, just
 // SSID and PW for Config Portal
 String ssid = "WIOTerminal";
 const char* password = "WIOTerminal_Pass";
-``` 
+```
+
 then connect WebBrowser to configurable ConfigPortal IP address, default is 192.168.1.1
 
 - Choose one of the access points scanned, enter password, click ***Save***.
@@ -343,25 +418,25 @@ const char* password = "WIOTerminal_Pass";
 After you connected, please, go to http://192.168.1.1, you'll see this `Main` page:
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Main.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/raw/main/Images/Main.png">
 </p>
 
 Select `Information` to enter the Info page where the board info will be shown (short page)
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Info_Short.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/raw/main/Images/Info_Short.png">
 </p>
 
 Select `Configuration` to enter this page where you can select an AP and specify its WiFi Credentials
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Configuration.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/raw/main/Images/Configuration.png">
 </p>
 
 Enter your credentials, then click ***Save***. The WiFi Credentials will be saved and the board reboots to connect to the selected WiFi AP.
 
 <p align="center">
-    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/blob/main/Images/Saved.png">
+    <img src="https://github.com/khoih-prog/WIOTerminal_WiFiManager/raw/main/Images/Saved.png">
 </p>
 
 If you're already connected to a listed WiFi AP and don't want to change anything, just select ***Exit Portal*** from the `Main` page to reboot the board and connect to the previously-stored AP. The WiFi Credentials are still intact.
@@ -434,7 +509,7 @@ void loop()
     Serial.println("\nConfiguration portal requested.");
     digitalWrite(PIN_LED, LED_ON); // turn the LED on by making the voltage LOW to tell us we are in configuration mode.
 
-    //Local initialization. Once its business is done, there is no need to keep it around
+    //Local intialization. Once its business is done, there is no need to keep it around
     WIO_WiFiManager WIO_wifiManager;
 
     WIO_wifiManager.setMinimumSignalQuality(-1);
@@ -604,7 +679,7 @@ WiFiMulti wifiMulti;
 #include <DoubleResetDetector_Generic.h>      //https://github.com/khoih-prog/DoubleResetDetector_Generic
 
 // Number of seconds after reset during which a
-// subsequent reset will be considered a double reset.
+// subseqent reset will be considered a double reset.
 #define DRD_TIMEOUT             10
 
 // RTC Memory Address for the DoubleResetDetector to use
@@ -729,7 +804,7 @@ void check_status(void)
     checkwifi_timeout = current_millis + WIFICHECK_INTERVAL;
   }
 
-  // Print heartbeat every HEARTBEAT_INTERVAL (10) seconds.
+  // Print hearbeat every HEARTBEAT_INTERVAL (10) seconds.
   if ((current_millis > checkstatus_timeout) || (checkstatus_timeout == 0))
   {
     heartBeatPrint();
@@ -888,7 +963,7 @@ void setup()
 
   unsigned long startedAt = millis();
 
-  //Local initialization. Once its business is done, there is no need to keep it around
+  //Local intialization. Once its business is done, there is no need to keep it around
   WIO_WiFiManager WIO_wifiManager;
 
   WIO_wifiManager.setDebugOutput(true);
@@ -1086,9 +1161,11 @@ void loop()
 ---
 ---
 
-### Debug Termimal Output Samples
+## Debug Terminal Output Samples
 
-1. This is terminal debug output when running [WIOT_ConfigOnDoubleReset](examples/WIOT_ConfigOnDoubleReset) on  ***SeeedStudio SAMD51 WIO-Terminal***. 
+### 1. WIOT_ConfigOnDoubleReset
+
+This is terminal debug output when running [WIOT_ConfigOnDoubleReset](examples/WIOT_ConfigOnDoubleReset) on **SeeedStudio SAMD51 WIO-Terminal**. 
 
 Config Portal (CP) was requested to input and save WiFi Credentials. The boards then connected to WiFi successfully. Then DRD was detected, CP was again requested to update WiFi Credentials.
 
@@ -1096,7 +1173,7 @@ Config Portal (CP) was requested to input and save WiFi Credentials. The boards 
 
 ```
 Starting WIOT_ConfigOnDoubleReset with DoubleResetDetect on WIO_TERMINAL
-WIOTerminal_WiFiManager v1.2.0
+WIOTerminal_WiFiManager v1.2.1
 [WM] Set CORS Header to :  Your Access-Control-Allow-Origin
 Flag read = 0xffffffff
 No doubleResetDetected
@@ -1137,7 +1214,7 @@ H
 
 ```
 Starting WIOT_ConfigOnDoubleReset with DoubleResetDetect on WIO_TERMINAL
-WIOTerminal_WiFiManager v1.2.0
+WIOTerminal_WiFiManager v1.2.1
 [WM] Set CORS Header to :  Your Access-Control-Allow-Origin
 Flag read = 0xd0d01234
 doubleResetDetected
@@ -1175,7 +1252,9 @@ H
 ```
 ---
 
-2. This is terminal debug output when running [WIOT_ConfigOnSwitch](examples/WIOT_ConfigOnSwitch) on  ***SeeedStudio SAMD51 WIO-Terminal***.
+### 2. WIOT_ConfigOnSwitch
+
+This is terminal debug output when running [WIOT_ConfigOnSwitch](examples/WIOT_ConfigOnSwitch) on  **SeeedStudio SAMD51 WIO-Terminal**.
 
 By pressing a Switch (WIO_KEY_C or WIO_KEY_B), Config Portal (CP) was requested in loop() to update and save WiFi Credentials.
 
@@ -1185,7 +1264,7 @@ The boards then connected to WiFi successfully.
 
 ```cpp
 Starting WIOT_ConfigOnSwitch on WIO_TERMINAL
-WIOTerminal_WiFiManager v1.2.0
+WIOTerminal_WiFiManager v1.2.1
 [WM] Calc. CheckSum = 0xbf40 , Read CheckSum = 0xffffffff  **<======== Restart and No stored data in Flash**
 Stored: SSID = , Pass = 
 Open Config Portal without Timeout: No stored Credentials.
@@ -1247,7 +1326,9 @@ HHHHHHHHHH
 
 ---
 
-3. This is terminal debug output when running [WIOT_ConfigOnSwitch_1WiFi](examples/WIOT_ConfigOnSwitch_1WiFi) on  ***SeeedStudio SAMD51 WIO-Terminal*** to demonstrate how to configure the library to work with only single WiFi.
+### 3. WIOT_ConfigOnSwitch_1WiFi
+
+This is terminal debug output when running [WIOT_ConfigOnSwitch_1WiFi](examples/WIOT_ConfigOnSwitch_1WiFi) on  **SeeedStudio SAMD51 WIO-Terminal** to demonstrate how to configure the library to work with only single WiFi.
 
 By pressing a Switch (WIO_KEY_C or WIO_KEY_B), Config Portal (CP) was requested in loop() to update and save WiFi Credentials.
 
@@ -1257,7 +1338,7 @@ The boards then connected to WiFi successfully.
 
 ```cpp
 Starting WIOT_ConfigOnSwitch_1WiFi on WIO_TERMINAL
-WIOTerminal_WiFiManager v1.2.0
+WIOTerminal_WiFiManager v1.2.1
 [WM] Set CORS Header to :  Your Access-Control-Allow-Origin
 Calc. CheckSum = 0x5fa0, Read CheckSum = 0xffffffff
 Stored: SSID = , Pass = 
@@ -1348,7 +1429,7 @@ H
 
 ```
 Starting WIOT_ConfigOnSwitch_1WiFi on WIO_TERMINAL
-WIOTerminal_WiFiManager v1.2.0
+WIOTerminal_WiFiManager v1.2.1
 [WM] Set CORS Header to :  Your Access-Control-Allow-Origin
 Calc. CheckSum = 0x5e3, Read CheckSum = 0x5e3
 [WM] * Add SSID =  HueNet1 , PW =  12345678
@@ -1377,7 +1458,7 @@ Configuring AP SSID = WIOTerminal
 [WM] WIO_WiFiManager::startConfigPortal : Enter loop
 ```
 
-#### Save Credentials fron CP
+#### Save Credentials from CP
 
 ```
 [WM] WiFi save
@@ -1394,7 +1475,9 @@ H
 
 ---
 
-4. This is terminal debug output when running [WIOT_ConfigOnStartup](examples/WIOT_ConfigOnStartup) on  ***SeeedStudio SAMD51 WIO-Terminal***.
+### 4. WIOT_ConfigOnStartup
+
+This is terminal debug output when running [WIOT_ConfigOnStartup](examples/WIOT_ConfigOnStartup) on  **SeeedStudio SAMD51 WIO-Terminal**.
 
 This example will open a configuration portal for CONFIG_PORTAL_TIMEOUT_SEC seconds when first powered up if the boards has stored WiFi Credentials.
 
@@ -1404,7 +1487,7 @@ Otherwise, it'll stay indefinitely in ConfigPortal until getting WiFi Credential
 
 ```cpp
 Starting WIOT_ConfigOnStartup on WIO_TERMINAL
-WIOTerminal_WiFiManager v1.2.0
+WIOTerminal_WiFiManager v1.2.1
 Calc. CheckSum = 0xbf40, Read CheckSum = 0xffffffff
 [WM] Stored: SSID =  , Pass = 
 [WM] Opening configuration portal.
@@ -1439,7 +1522,7 @@ H
 
 ```
 Starting ConfigOnStartup on WIO_TERMINAL
-WIOTerminal_WiFiManager v1.2.0
+WIOTerminal_WiFiManager v1.2.1
 Calc. CheckSum = 0xbc7, Read CheckSum = 0xbc7
 [WM] * Add SSID =  HueNet1 , PW =  12345678
 [WM] * Add SSID =  HueNet2 , PW =  12345678
@@ -1509,12 +1592,6 @@ Submit issues to: [WIOTerminal_WiFiManager issues](https://github.com/khoih-prog
 ---
 ---
 
-### Releases v1.2.0
-
-1. Initial Coding for WIO Terminal. Sync with [ESP_WiFiManager v1.2.0](https://github.com/khoih-prog/ESP_WiFiManager)
-
----
----
 
 ### CURRENT LIMITATIONS
 
@@ -1524,6 +1601,11 @@ Due to some problems of still-unmature `Seeed_Arduino_rpcUnified` and `Seeed_Ard
 2. AP IP Address is only `192.168.1.1`
 3. Some new versions of `Seeed_Arduino_rpcUnified` and `Seeed_Arduino_rpcWiFi` will break the WiFi Scanning process and hang there.
 
+
+Please use and test to see if the limitations are fixed.
+
+---
+---
 
 ### TO DO
 
