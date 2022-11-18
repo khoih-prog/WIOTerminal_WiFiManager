@@ -11,20 +11,19 @@
 
   Built by Khoi Hoang https://github.com/khoih-prog/WIOTerminal_WiFiManager
   Licensed under MIT license
-  Version: 1.2.1
+  Version: 1.2.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.2.0   K Hoang      14/12/2020 Initial Coding for WIO Terminal. Sync with ESP_WiFiManager v1.2.0
-  1.2.1   K Hoang      13/10/2021 Update `platform.ini` and `library.json`
  *****************************************************************************************************************************/
 
 #pragma once
 
 #ifdef WIO_WIFIMGR_DEBUG_PORT
-  #define WIO_DBG_PORT      WIO_WIFIMGR_DEBUG_PORT
+	#define WIO_DBG_PORT      WIO_WIFIMGR_DEBUG_PORT
 #else
-  #define WIO_DBG_PORT      Serial
+	#define WIO_DBG_PORT      Serial
 #endif
 
 // Change _WIO_WIFIMGR_LOGLEVEL_ to set tracing and logging verbosity
@@ -35,7 +34,7 @@
 // 4: DEBUG: errors, warnings, informational and debug
 
 #ifndef _WIO_WIFIMGR_LOGLEVEL_
-  #define _WIO_WIFIMGR_LOGLEVEL_       0
+	#define _WIO_WIFIMGR_LOGLEVEL_       0
 #endif
 
 #define WIO_LOGERROR(x)         if(_WIO_WIFIMGR_LOGLEVEL_>0) { WIO_DBG_PORT.print("[WM] "); WIO_DBG_PORT.println(x); }
