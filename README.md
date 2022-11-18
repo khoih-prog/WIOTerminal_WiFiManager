@@ -509,7 +509,7 @@ void loop()
     Serial.println("\nConfiguration portal requested.");
     digitalWrite(PIN_LED, LED_ON); // turn the LED on by making the voltage LOW to tell us we are in configuration mode.
 
-    //Local intialization. Once its business is done, there is no need to keep it around
+    //Local initialization. Once its business is done, there is no need to keep it around
     WIO_WiFiManager WIO_wifiManager;
 
     WIO_wifiManager.setMinimumSignalQuality(-1);
@@ -679,7 +679,7 @@ WiFiMulti wifiMulti;
 #include <DoubleResetDetector_Generic.h>      //https://github.com/khoih-prog/DoubleResetDetector_Generic
 
 // Number of seconds after reset during which a
-// subseqent reset will be considered a double reset.
+// subsequent reset will be considered a double reset.
 #define DRD_TIMEOUT             10
 
 // RTC Memory Address for the DoubleResetDetector to use
@@ -804,7 +804,7 @@ void check_status(void)
     checkwifi_timeout = current_millis + WIFICHECK_INTERVAL;
   }
 
-  // Print hearbeat every HEARTBEAT_INTERVAL (10) seconds.
+  // Print heartbeat every HEARTBEAT_INTERVAL (10) seconds.
   if ((current_millis > checkstatus_timeout) || (checkstatus_timeout == 0))
   {
     heartBeatPrint();
@@ -963,7 +963,7 @@ void setup()
 
   unsigned long startedAt = millis();
 
-  //Local intialization. Once its business is done, there is no need to keep it around
+  //Local initialization. Once its business is done, there is no need to keep it around
   WIO_WiFiManager WIO_wifiManager;
 
   WIO_wifiManager.setDebugOutput(true);
